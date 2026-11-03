@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Empório da Música — Atendimento</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="header">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">♪</div>
+          <div>
+            <h1>Empório da Música</h1>
+            <p>Sua música começa aqui.</p>
+          </div>
+        </div>
+        <button id="new-conversation" class="ghost-button" type="button">
+          Nova conversa
+        </button>
+      </header>
+
+      <main class="chat-shell">
+        <div id="config-banner" class="banner hidden" role="status"></div>
+        <section id="messages" class="messages" aria-live="polite" aria-label="Conversa">
+          <div class="welcome">
+            <h2>Olá! Como posso ajudar?</h2>
+            <p>
+              Posso consultar instrumentos, preços, estoque, promoções, pedidos e as
+              políticas da loja.
+            </p>
+            <div class="suggestions">
+              <button class="suggestion" type="button" data-message="Quais violões custam até R$ 1000?">
+                Violões até R$ 1000
+              </button>
+              <button class="suggestion" type="button" data-message="Quanto custa o Takamine GD20?">
+                Preço do Takamine GD20
+              </button>
+              <button class="suggestion" type="button" data-message="Qual o horário e o endereço da loja?">
+                Horário e endereço
+              </button>
+              <button class="suggestion" type="button" data-message="Me arrependi da minha compra, posso devolver?">
+                Política de devolução
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <form id="chat-form" class="composer">
+          <label class="sr-only" for="message-input">Mensagem</label>
+          <textarea
+            id="message-input"
+            rows="1"
+            maxlength="2000"
+            placeholder="Digite sua mensagem..."
+            autocomplete="off"
+          ></textarea>
+          <button id="send-button" type="submit" aria-label="Enviar mensagem">Enviar</button>
+        </form>
+        <p class="composer-hint">
+          Atendimento virtual • WhatsApp (67) 3321-4500 • Respostas em até 24h úteis para casos escalados.
+        </p>
+      </main>
+    </div>
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>
