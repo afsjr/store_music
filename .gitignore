@@ -21,3 +21,6 @@ dist/
 # Sistema
 .DS_Store
 *.log
+
+# Editores
+.vscode/
