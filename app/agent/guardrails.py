@@ -61,10 +61,22 @@ SENSITIVE_PATTERNS = (
     re.compile(r"\b(status|entregue|enviado|confirmado|pendente|cancelado)\b", re.IGNORECASE),
 )
 
-
 POLICY_TERMS = re.compile(
-    r"\b(devolv|arrepend|troca|garantia|frete|entrega|parcel|pix|horario|"
-    r"horário|endereco|endereço|pagamento|politica|política)\w*",
+    r"\b("
+    r"devolv|arrepend|troca|garantia|frete|entrega|parcel|pix|horario|endereco|"
+    r"pagamento|politica|defeito|conserto|assistencia|prazo|cartao|credito|debito|"
+    r"boleto|desconto|promoc|parcela|juros|abert|fechad|fundad|historia|lgpd|"
+    r"dados|exclu|consentimento|correios|transportadora|motoboy|cep|peso|dimens|"
+    r"preferencia|regulagem|boquilha|avaria|seguro|atendimento|expediente|sla"
+    r")\w*"
+    r"|\brain\s*check\b"
+    r"|\bvenda\s+final\b"
+    r"|\btempo\s+de\s+resposta\b"
+    r"|\bfora\s+do\s+expediente\b"
+    r"|\bsetup\b"
+    r"|\bsedex\b"
+    r"|\bjadlog\b"
+    r"|\bpac\b",
     re.IGNORECASE,
 )
 
