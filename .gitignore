@@ -1,3 +1,4 @@
 # Reversa
 .reversa/config.user.toml
-_reversa_sdd/
+
+# As especificações em _reversa_sdd/ são versionadas de propósito.

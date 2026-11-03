@@ -288,5 +288,18 @@
     ".reversa/version",
     ".reversa/_config/manifest.yaml",
     ".gitignore"
-  ]
+  ],
+  "newproject_progress": {
+    "mode": "guiado",
+    "stage": "done",
+    "started_at": "2026-11-03T14:15:00.932098Z",
+    "last_checkpoint_at": "2026-11-03T14:39:33.660664Z",
+    "completed_stages": [
+      "ideator",
+      "researcher",
+      "drafter",
+      "spec-sdd"
+    ],
+    "brief": "Construir um agente de atendimento por mensagens de texto para a Empório da Música, loja fictícia de instrumentos musicais em Campo Grande/MS, para reduzir a carga da equipe em perguntas recorrentes. "
+  }
 }
