@@ -93,6 +93,15 @@ class CatalogService:
     def promotion(self, product_id: int) -> Promotion | None:
         return self.promotions.active_promotion(product_id)
 
+    def promotions_for_product(self, product_id: int) -> list[Promotion]:
+        return self.promotions.promotions_for_product(product_id)
+
+    def expired_promotion(self, product_id: int) -> Promotion | None:
+        expired = [
+            promo for promo in self.promotions_for_product(product_id) if not promo.is_active
+        ]
+        return max(expired, key=lambda promo: promo.promotion_id) if expired else None
+
     def pix_price(self, product: Product) -> float | None:
         if product.has_active_promotion:
             return None

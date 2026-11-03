@@ -238,6 +238,11 @@ class InMemoryStore:
             return None
         return max(active, key=lambda p: p.discount_percent)
 
+    def promotions_for_product(self, product_id: int) -> list[Promotion]:
+        promotions = [promo for promo in self.promotions if promo.product_id == product_id]
+        promotions.sort(key=lambda promo: (promo.is_active, promo.promotion_id), reverse=True)
+        return promotions
+
     # Clientes ----------------------------------------------------------------
     def find_customer(self, name: str, contact: str) -> list[Customer]:
         target_name = normalize_text(name)

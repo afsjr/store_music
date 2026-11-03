@@ -194,6 +194,28 @@ class SupabaseStore:
             is_active=row["is_active"],
         )
 
+    def promotions_for_product(self, product_id: int) -> list[Promotion]:
+        with self._connect() as conn:
+            rows = conn.execute(
+                """
+                select promotion_id, product_id, discount_percent, description, is_active
+                from promotions
+                where product_id = %s
+                order by is_active desc, promotion_id desc
+                """,
+                (product_id,),
+            ).fetchall()
+        return [
+            Promotion(
+                promotion_id=row["promotion_id"],
+                product_id=row["product_id"],
+                discount_percent=float(row["discount_percent"]),
+                description=row["description"],
+                is_active=row["is_active"],
+            )
+            for row in rows
+        ]
+
     def find_customer(self, name: str, contact: str) -> list[Customer]:
         digits = "".join(ch for ch in contact if ch.isdigit())
         with self._connect() as conn:
