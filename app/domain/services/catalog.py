@@ -102,6 +102,29 @@ class CatalogService:
         ]
         return max(expired, key=lambda promo: promo.promotion_id) if expired else None
 
+    def alternatives(self, product_id: int, limit: int = 3) -> list[Product]:
+        product = self.get(product_id=product_id)
+        if product is None:
+            return []
+        candidates = self.catalog.search_products(
+            category=str(product.category_id),
+            in_stock=True,
+            limit=50,
+        )
+        target_price = product.effective_price or product.price_brl
+        available = [
+            self._enrich(candidate)
+            for candidate in candidates
+            if candidate.product_id != product.product_id
+        ]
+        available.sort(
+            key=lambda candidate: (
+                abs((candidate.effective_price or candidate.price_brl) - target_price),
+                candidate.effective_price or candidate.price_brl,
+            )
+        )
+        return available[: max(1, min(limit, 5))]
+
     def pix_price(self, product: Product) -> float | None:
         if product.has_active_promotion:
             return None

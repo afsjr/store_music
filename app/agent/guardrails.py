@@ -61,6 +61,41 @@ SENSITIVE_PATTERNS = (
     re.compile(r"\b(status|entregue|enviado|confirmado|pendente|cancelado)\b", re.IGNORECASE),
 )
 
+OUT_OF_SCOPE_PATTERNS = (
+    re.compile(
+        r"\b(concorrente|outra loja|outras lojas|mercado livre|amazon|magazine luiza|"
+        r"casas bahia|guitar center|sweetwater|aliexpress|shopee)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(advogado|advogada|processo judicial|juridico|justica|tribunal|"
+        r"medico|medica|remedio|doenca|diagnostico|receita medica)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(politica partidaria|presidente|eleicao|deputado|senador|governo|"
+        r"lula|bolsonaro|stf|congresso)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(futebol|flamengo|corinthians|palmeiras|cruzeiro|atletico|"
+        r"campeonato|jogo do brasil)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(noticia|noticias|clima|previsao do tempo|receita de bolo|"
+        r"capital da franca|capital do brasil|capital de portugal|"
+        r"programacao|codigo python)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(geladeira|fogao|microondas|celular|computador|notebook|"
+        r"televisao|carro|moto|roupa|sapato|comida)\b",
+        re.IGNORECASE,
+    ),
+)
+
+
 POLICY_TERMS = re.compile(
     r"\b("
     r"devolv|arrepend|troca|garantia|frete|entrega|parcel|pix|horario|endereco|"
@@ -94,14 +129,36 @@ def is_accessory_request(message: str) -> bool:
         r"\b(com cordas|cordas de nylon|cordas de aco|cordas de aço)\b", normalized
     ):
         return False
+    # "violão de 7 cordas" e modelos com "N cordas" no nome são instrumentos.
+    if re.search(r"\b\d+\s*cordas\b", normalized):
+        has_instrument = any(term in normalized for term in INSTRUMENT_TERMS)
+        has_accessory_intent = bool(
+            re.search(r"\b(reposicao|jogo|comprar|trocar|substituir)\b", normalized)
+        )
+        if has_instrument or not has_accessory_intent:
+            return False
     return True
+
+
+def is_out_of_scope_topic(message: str) -> bool:
+    normalized = normalize_text(message)
+    return any(pattern.search(normalized) for pattern in OUT_OF_SCOPE_PATTERNS)
 
 
 def out_of_scope_response() -> str:
     return (
         "A Empório da Música trabalha apenas com instrumentos musicais e não comercializa "
         "acessórios como cordas, palhetas, cabos, cases, pedais ou amplificadores. "
-        "Posso te ajudar a encontrar um instrumento ou indicar uma loja parceira para o acessório."
+        "Posso ajudar a encontrar um instrumento ou encaminhar seu contato para a equipe, "
+        "que pode orientar sobre onde encontrar o acessório."
+    )
+
+
+def general_out_of_scope_response() -> str:
+    return (
+        "Posso ajudar apenas com instrumentos musicais, pedidos e políticas da Empório da "
+        "Música. Para esse assunto, não consigo responder. Se quiser, posso encaminhar seu "
+        "atendimento para a equipe."
     )
 
 

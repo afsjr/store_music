@@ -19,6 +19,31 @@ def test_buscar_produtos_tool(tools):
     assert all(item["preco_efetivo"] <= 1000 for item in result.result["produtos"])
 
 
+def test_buscar_produtos_recovers_unavailable_with_alternatives(tools):
+    result = tools.execute(
+        "buscar_produtos",
+        {"termo": "Giannini GF-3D", "apenas_em_estoque": True},
+        "sessao",
+    )
+    assert result.ok is True
+    assert result.result["produtos"][0]["product_id"] == 96
+    assert result.result["produtos"][0]["disponivel"] is False
+    assert result.result["alternativas"]
+    assert all(item["disponivel"] for item in result.result["alternativas"])
+
+
+def test_buscar_produtos_recovers_discontinued_with_alternatives(tools):
+    result = tools.execute(
+        "buscar_produtos",
+        {"termo": "Shelby SN-7C 7 Cordas", "apenas_em_estoque": True},
+        "sessao",
+    )
+    assert result.ok is True
+    assert result.result["produtos"][0]["product_id"] == 113
+    assert result.result["produtos"][0]["status"] == "discontinued"
+    assert result.result["alternativas"]
+
+
 def test_identificar_cliente_tool(tools):
     result = tools.execute(
         "identificar_cliente",
@@ -65,7 +90,10 @@ def test_escalar_atendimento_tool(tools, conversations):
 def test_accessory_detection():
     assert is_accessory_request("Vocês vendem cordas de violão?") is True
     assert is_accessory_request("Quero um amplificador para guitarra") is True
+    assert is_accessory_request("Quero 6 cordas de reposição") is True
     assert is_accessory_request("Violão com cordas de nylon") is False
+    assert is_accessory_request("Vocês têm o Shelby SN-7C 7 Cordas?") is False
+    assert is_accessory_request("Quero um violão de 7 cordas") is False
     assert is_accessory_request("Quais violões até R$ 1000?") is False
 
 

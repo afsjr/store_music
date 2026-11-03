@@ -5,7 +5,9 @@ import logging
 
 from app.adapters.llm.base import LLMUnavailableError
 from app.agent.guardrails import (
+    general_out_of_scope_response,
     is_accessory_request,
+    is_out_of_scope_topic,
     needs_policy_retrieval,
     out_of_scope_response,
     safe_fallback_response,
@@ -69,6 +71,11 @@ class AgentOrchestrator:
 
         if is_accessory_request(message):
             reply = out_of_scope_response()
+            self.conversations.append_assistant(session.session_id, reply)
+            return AgentReply(reply=reply, session_id=session.session_id)
+
+        if is_out_of_scope_topic(message):
+            reply = general_out_of_scope_response()
             self.conversations.append_assistant(session.session_id, reply)
             return AgentReply(reply=reply, session_id=session.session_id)
 
