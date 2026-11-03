@@ -149,6 +149,10 @@ Sem `DEEPSEEK_API_KEY`, a aplicação sobe, mas o chat retorna 503 e a UI mostra
 
 ### Supabase (opcional)
 
+> `SUPABASE_DB_URL` deve ser a **connection string Postgres** do painel do Supabase
+> (`postgresql://...`), não a URL `https://...supabase.co` da API. Com a URL da API,
+> o projeto cai automaticamente no modo local em memória.
+
 ```bash
 psql "$SUPABASE_DB_URL" -f supabase/migrations/001_schema.sql
 python -m scripts.ingest

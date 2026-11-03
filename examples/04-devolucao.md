@@ -1,17 +1,23 @@
-# Exemplo 4 — Aplicação da política de devolução
+# Aplicação da política de devolução
 
-> Cenário reproduzível com `STORE_TODAY=2026-02-20` no `.env`.
+> Exemplo gerado pelo runner local com o agente real.
 
 **Cliente:** Meu nome é Letícia Gonçalves Rocha, telefone (67) 99789-0123. Me arrependi da compra do pedido 7. Posso devolver?
 
-**Agente:** Localizei seu cadastro, Letícia. O **pedido 7** consta como **entregue em 17/02/2026**. Considerando hoje, 20/02/2026, passaram-se **3 dias corridos** desde o recebimento. Portanto, você está dentro do prazo de **7 dias corridos** do direito de arrependimento.
+**Agente:** Claro, Letícia, você pode devolver sim.
 
-Para a devolução, o produto precisa estar na embalagem original, sem sinais de uso, com todos os acessórios e manuais. O reembolso é feito na mesma forma de pagamento original em até **10 dias úteis**, e o frete de devolução fica por conta da loja nesse caso.
+Conferi o pedido 7 aqui no sistema:
+- Produto: Shelby SU-21S Soprano Sunburst (1 unidade)
+- Valor: R$ 159,90, pago em cartão de crédito em 3x
+- Status: entregue em 17/02/2026
+- Como o recebimento foi há 3 dias, você está dentro do prazo de arrependimento, que vai até 24/02/2026
 
-Fonte: Manual de Políticas, seção 4.1 — Direito de Arrependimento (Compras Online), p. 4.
+Condições da devolução por arrependimento:
+- Produto na embalagem original, sem sinais de uso, com todos os acessórios e manuais
+- O reembolso é feito na mesma forma de pagamento original, em até 10 dias úteis
+- O frete de devolução fica por conta da loja
 
-Quer que eu encaminhe sua solicitação para a equipe iniciar o processo de devolução?
+Uma observação: o produto não é de liquidação com aviso de venda final nem se enquadra nas exceções de troca, então está elegível.
 
-**Cliente:** Quero sim.
-
-**Agente:** Perfeito. Registrei o encaminhamento para a equipe com o resumo do pedido 7 e o motivo “arrependimento dentro do prazo”. O retorno ocorre em até 24 horas úteis. Você receberá as instruções de postagem e o prazo de reembolso.
+Quer que eu já encaminhe a solicitação de devolução para a nossa equipe dar andamento?
+*Fontes: Manual, seção 4.1, p. 4, Manual, seção 4.4, p. 4, Manual, seção 4.2, p. 4*

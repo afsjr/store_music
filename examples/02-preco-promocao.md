@@ -1,9 +1,13 @@
-# Exemplo 2 — Preço e promoção
+# Preço e promoção
+
+> Exemplo gerado pelo runner local com o agente real.
 
 **Cliente:** Quanto custa o Takamine GD20? Tem alguma promoção ativa?
 
-**Agente:** O **Takamine GD20 Dreadnought Natural** (código 95) está por **R$ 2.199,00**. Não há promoção ativa para esse modelo no momento.
+**Agente:** O Takamine GD20 Dreadnought Natural está saindo por R$ 2.199,00.
 
-No PIX, com o desconto de 5% sobre o preço de tabela, fica **R$ 2.089,05**. No cartão de crédito, o valor pode ser parcelado em até 12x sem juros, respeitando a parcela mínima de R$ 100,00 para 7x a 12x. Nesse caso, 12x ficaria em R$ 183,25 por parcela.
+Não há promoção ativa para ele no momento. Mas o pagamento via PIX tem 5% de desconto aplicado, ficando em R$ 2.089,05.
 
-Fonte: Manual de Políticas, seção 3 (formas de pagamento e parcelamento) e seção 6.2 (regras de promoções).
+Temos 5 unidades disponíveis em estoque. Ele é um violão dreadnought com tampo sólido em cedro, laterais e fundo em sapele, braço em mogno e escala de 650mm, sem eletrônica.
+
+Precisa de mais alguma coisa?
