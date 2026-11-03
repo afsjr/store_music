@@ -58,17 +58,29 @@ def mask_email(email: str | None) -> str:
     return f"{prefix}***@{domain}"
 
 
-def mask_pii(text: str) -> str:
+def mask_pii(
+    text: str,
+    allow_phones: set[str] | None = None,
+    allow_emails: set[str] | None = None,
+) -> str:
     if not text:
         return text
-    masked = re.sub(
-        r"[\w.+-]+@[\w-]+\.[\w.-]+",
-        lambda m: mask_email(m.group(0)),
-        text,
-    )
-    masked = re.sub(
-        r"\(?\d{2}\)?\s?\d{4,5}[-\s]?\d{4}",
-        lambda m: mask_phone(m.group(0)),
-        masked,
-    )
+    allowed_phones = allow_phones or set()
+    allowed_emails = {email.lower() for email in (allow_emails or set())}
+
+    def email_replacer(match: re.Match) -> str:
+        email = match.group(0)
+        if email.lower() in allowed_emails:
+            return email
+        return mask_email(email)
+
+    def phone_replacer(match: re.Match) -> str:
+        phone = match.group(0)
+        digits = re.sub(r"\D", "", phone)
+        if digits in allowed_phones:
+            return phone
+        return mask_phone(phone)
+
+    masked = re.sub(r"[\w.+-]+@[\w-]+\.[\w.-]+", email_replacer, text)
+    masked = re.sub(r"\(?\d{2}\)?\s?\d{4,5}[-\s]?\d{4}", phone_replacer, masked)
     return masked

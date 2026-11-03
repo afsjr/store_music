@@ -29,10 +29,17 @@ WEB_DIR = Path(__file__).parent / "web"
 
 def build_store(settings: Settings):
     if settings.supabase_enabled:
+        db_url = settings.supabase_db_url or ""
+        if db_url.startswith(("http://", "https://")):
+            logger.error(
+                "SUPABASE_DB_URL parece ser a URL da API. Use a connection string "
+                "Postgres (postgresql://...) do painel do Supabase. Usando modo local."
+            )
+            return InMemoryStore(settings.data_path, settings.store_today_date), "local"
         try:
             from app.adapters.supabase.store import SupabaseStore
 
-            return SupabaseStore(settings.supabase_db_url or ""), "supabase"
+            return SupabaseStore(db_url), "supabase"
         except Exception:  # noqa: BLE001
             logger.exception(
                 "Não foi possível conectar ao Supabase; usando o modo local em memória."

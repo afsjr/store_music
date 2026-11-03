@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import json
-import re
-import unicodedata
 import uuid
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -23,18 +21,7 @@ from app.domain.models import (
     StoreInfo,
 )
 from app.domain.store_info import STORE_INFO
-
-
-def normalize_text(value: Any) -> str:
-    if value is None:
-        return ""
-    text = str(value).strip().lower()
-    text = unicodedata.normalize("NFKD", text)
-    return "".join(ch for ch in text if not unicodedata.combining(ch))
-
-
-def digits_only(value: Any) -> str:
-    return re.sub(r"\D", "", str(value or ""))
+from app.domain.text import digits_only, normalize_text
 
 
 def _parse_date(value: Any) -> date | None:

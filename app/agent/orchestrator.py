@@ -76,6 +76,7 @@ class AgentOrchestrator:
             *self.conversations.history_for_prompt(session.session_id),
         ]
         tool_results: list[ToolResult] = []
+        seen_tool_calls: dict[tuple[str, str], ToolResult] = {}
         final_text: str | None = None
         handoff = False
 
@@ -103,9 +104,17 @@ class AgentOrchestrator:
                         }
                     )
                     for tool_call in response.tool_calls:
-                        result = self.tools.execute(
-                            tool_call.name, tool_call.arguments, session.session_id
+                        cache_key = (
+                            tool_call.name,
+                            json.dumps(tool_call.arguments, sort_keys=True, ensure_ascii=False),
                         )
+                        if cache_key in seen_tool_calls:
+                            result = seen_tool_calls[cache_key]
+                        else:
+                            result = self.tools.execute(
+                                tool_call.name, tool_call.arguments, session.session_id
+                            )
+                            seen_tool_calls[cache_key] = result
                         tool_results.append(result)
                         if result.name == "escalar_atendimento" and result.ok:
                             handoff = True
@@ -154,6 +163,9 @@ class AgentOrchestrator:
                 self._record_blocked_handoff(session.session_id)
 
             citations = self._extract_citations(tool_results)
+            mentioned = [citation for citation in citations if citation.section in final_text]
+            if mentioned:
+                citations = mentioned
             self.conversations.append_assistant(
                 session.session_id,
                 final_text,

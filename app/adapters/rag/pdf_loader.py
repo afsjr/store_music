@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import re
-import unicodedata
 from pathlib import Path
 
 import pdfplumber
@@ -14,12 +13,6 @@ NOISE_PREFIXES = (
     "Empório da Música Manual de Políticas",
     "Empório da Música — Sua música começa aqui.",
 )
-
-
-def normalize_text(value: str) -> str:
-    text = (value or "").strip().lower()
-    text = unicodedata.normalize("NFKD", text)
-    return "".join(ch for ch in text if not unicodedata.combining(ch))
 
 
 def _clean_lines(text: str) -> list[str]:

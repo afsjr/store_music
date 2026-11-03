@@ -3,6 +3,24 @@ from __future__ import annotations
 from app.domain.format import format_brl
 from app.domain.models import Product, Promotion
 from app.domain.ports import CatalogRepository, PromotionRepository
+from app.domain.text import normalize_text
+
+CATEGORY_ALIASES = {
+    "violao": "Violões",
+    "violoes": "Violões",
+    "guitarra": "Guitarras",
+    "guitarras": "Guitarras",
+    "baixo": "Baixos",
+    "baixos": "Baixos",
+    "ukulele": "Ukuleles",
+    "ukuleles": "Ukuleles",
+    "bateria": "Baterias e Percussão",
+    "baterias": "Baterias e Percussão",
+    "teclado": "Teclados e Pianos",
+    "teclados": "Teclados e Pianos",
+    "piano": "Teclados e Pianos",
+    "pianos": "Teclados e Pianos",
+}
 
 
 class CatalogService:
@@ -33,6 +51,13 @@ class CatalogService:
             }
         )
 
+    def _infer_category(self, term: str | None) -> str | None:
+        normalized = normalize_text(term)
+        for alias, category in CATEGORY_ALIASES.items():
+            if alias in normalized:
+                return category
+        return None
+
     def search(
         self,
         term: str | None = None,
@@ -42,6 +67,8 @@ class CatalogService:
         in_stock: bool = True,
         limit: int = 10,
     ) -> list[Product]:
+        if not category:
+            category = self._infer_category(term)
         products = self.catalog.search_products(
             term=term,
             category=category,

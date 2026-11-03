@@ -1,16 +1,21 @@
 from __future__ import annotations
 
 import re
-import unicodedata
 
 from app.domain.models import ToolResult
+from app.domain.store_info import STORE_INFO
+from app.domain.text import digits_only, normalize_text
 from app.logging import mask_pii
 
+EMOJI_RE = re.compile(r"[\U0001F300-\U0001FAFF\u2600-\u27BF\uFE0F]")
+ALLOWED_PHONES = {digits_only(STORE_INFO.phone), digits_only(STORE_INFO.whatsapp)}
+ALLOWED_EMAILS = {STORE_INFO.email.lower()}
 
-def normalize_text(value: str) -> str:
-    text = (value or "").strip().lower()
-    text = unicodedata.normalize("NFKD", text)
-    return "".join(ch for ch in text if not unicodedata.combining(ch))
+
+def strip_formatting(text: str) -> str:
+    text = EMOJI_RE.sub("", text or "")
+    text = text.replace("**", "").replace("`", "")
+    return re.sub(r"[ \t]+\n", "\n", text).strip()
 
 
 ACCESSORY_TERMS = (
@@ -93,8 +98,9 @@ def sanitize_response(
     tool_calls: list[ToolResult],
     has_tool_history: bool = False,
 ) -> tuple[str, bool]:
-    """Mascara PII e bloqueia afirmações de dados sem consulta às ferramentas."""
-    masked = mask_pii(text or "")
+    """Mascara PII, remove formatação e bloqueia afirmações sem consulta às ferramentas."""
+    cleaned = strip_formatting(text or "")
+    masked = mask_pii(cleaned, allow_phones=ALLOWED_PHONES, allow_emails=ALLOWED_EMAILS)
     if contains_sensitive_claim(masked) and not tool_calls and not has_tool_history:
         return safe_fallback_response(), True
     return masked, False

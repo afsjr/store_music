@@ -442,7 +442,13 @@ class ToolRegistry:
         }
 
     def _informacoes_loja(self, _: InformacoesLojaArgs, __: str) -> dict:
-        return self.policies.store_info_to_dict()
+        data = self.policies.store_info_to_dict()
+        data["citacoes"] = [
+            {"section": "1.2", "page": 2, "source": "Manual de Políticas"},
+            {"section": "2", "page": 2, "source": "Manual de Políticas"},
+            {"section": "7", "page": 6, "source": "Manual de Políticas"},
+        ]
+        return data
 
     def _calcular_frete(self, args: CalcularFreteArgs, _: str) -> dict:
         quote = self.shipping.quote(args.cidade, args.subtotal, args.cep)

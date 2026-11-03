@@ -5,8 +5,8 @@ import re
 from collections import Counter
 from collections.abc import Iterable
 
-from app.adapters.rag.pdf_loader import normalize_text
 from app.domain.models import PolicyChunk
+from app.domain.text import normalize_text
 
 TOKEN_RE = re.compile(r"(?u)\b\w+\b")
 STOPWORDS = {

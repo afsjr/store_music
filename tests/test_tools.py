@@ -87,3 +87,25 @@ def test_guardrail_allows_price_with_tool():
     )
     assert blocked is False
     assert "R$" in reply
+
+
+def test_guardrail_preserves_store_contacts():
+    reply, blocked = sanitize_response(
+        "Fale com a gente no (67) 3321-4500 ou contato@emporiodamusica.com.br",
+        [],
+        has_tool_history=True,
+    )
+    assert blocked is False
+    assert "(67) 3321-4500" in reply
+    assert "contato@emporiodamusica.com.br" in reply
+
+
+def test_guardrail_masks_customer_phone():
+    reply, blocked = sanitize_response(
+        "Seu telefone é (67) 99654-7821",
+        [],
+        has_tool_history=True,
+    )
+    assert blocked is False
+    assert "****7821" in reply
+    assert "99654-7821" not in reply

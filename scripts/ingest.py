@@ -470,6 +470,13 @@ def main() -> None:
             print("SUPABASE_DB_URL ausente; execução em modo dry-run.")
         return
 
+    if db_url.startswith(("http://", "https://")):
+        print(
+            "SUPABASE_DB_URL parece ser a URL da API. Use a connection string Postgres "
+            "(postgresql://...) do painel do Supabase."
+        )
+        raise SystemExit(1)
+
     _upsert(frames, db_url, counts)
     print("Ingestão concluída com sucesso.")
 
