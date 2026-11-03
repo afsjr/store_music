@@ -51,6 +51,11 @@ class CatalogService:
             }
         )
 
+    def _normalize_category(self, category: str | None) -> str | None:
+        if not category:
+            return None
+        return CATEGORY_ALIASES.get(normalize_text(category), category)
+
     def _infer_category(self, term: str | None) -> str | None:
         normalized = normalize_text(term)
         for alias, category in CATEGORY_ALIASES.items():
@@ -67,7 +72,9 @@ class CatalogService:
         in_stock: bool = True,
         limit: int = 10,
     ) -> list[Product]:
-        if not category:
+        if category:
+            category = self._normalize_category(category)
+        else:
             category = self._infer_category(term)
         products = self.catalog.search_products(
             term=term,

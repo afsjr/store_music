@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import uuid
 
-import psycopg
 from psycopg.rows import dict_row
 from psycopg.types.json import Json
+from psycopg_pool import ConnectionPool
 
 from app.domain.models import (
     Citation,
@@ -28,11 +28,18 @@ class SupabaseStore:
         if not db_url:
             raise ValueError("SUPABASE_DB_URL não configurada.")
         self.db_url = db_url
-        with self._connect() as conn:
+        self.pool = ConnectionPool(
+            conninfo=db_url,
+            min_size=1,
+            max_size=5,
+            kwargs={"autocommit": True, "row_factory": dict_row},
+            open=True,
+        )
+        with self.pool.connection() as conn:
             conn.execute("select 1")
 
     def _connect(self):
-        return psycopg.connect(self.db_url, autocommit=True, row_factory=dict_row)
+        return self.pool.connection()
 
     def _product_from_row(self, row: dict) -> Product:
         return Product(

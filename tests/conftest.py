@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
+
+# Mantém a suíte isolada de credenciais e do Supabase durante a coleta.
+os.environ["LOCAL_MODE"] = "true"
+os.environ["SUPABASE_DB_URL"] = ""
 
 import pytest
 from fastapi.testclient import TestClient

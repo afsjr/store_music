@@ -62,6 +62,17 @@ SENSITIVE_PATTERNS = (
 )
 
 
+POLICY_TERMS = re.compile(
+    r"\b(devolv|arrepend|troca|garantia|frete|entrega|parcel|pix|horario|"
+    r"horário|endereco|endereço|pagamento|politica|política)\w*",
+    re.IGNORECASE,
+)
+
+
+def needs_policy_retrieval(message: str) -> bool:
+    return bool(POLICY_TERMS.search(normalize_text(message)))
+
+
 def is_accessory_request(message: str) -> bool:
     normalized = normalize_text(message)
     if not any(term in normalized for term in ACCESSORY_TERMS):

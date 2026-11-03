@@ -422,6 +422,11 @@ class ToolRegistry:
                     "número do pedido e os dados de identificação."
                 ),
             }
+        details["citacoes"] = [
+            {"section": "4.1", "page": 4, "source": "Manual de Políticas"},
+            {"section": "4.2", "page": 4, "source": "Manual de Políticas"},
+            {"section": "8.1", "page": 7, "source": "Manual de Políticas"},
+        ]
         return {"status": "ok", **details}
 
     def _consultar_politicas(self, args: ConsultarPoliticasArgs, _: str) -> dict:

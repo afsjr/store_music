@@ -39,6 +39,8 @@ class Settings(BaseSettings):
     max_history: int = Field(default=12, ge=1, le=100)
     max_tool_iterations: int = Field(default=5, ge=1, le=20)
     llm_timeout_seconds: float = Field(default=30.0, gt=0)
+    llm_max_tokens: int = Field(default=800, ge=100, le=4000)
+    llm_thinking: bool = False
 
     @property
     def data_path(self) -> Path:

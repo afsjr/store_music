@@ -6,6 +6,7 @@ import logging
 from app.adapters.llm.base import LLMUnavailableError
 from app.agent.guardrails import (
     is_accessory_request,
+    needs_policy_retrieval,
     out_of_scope_response,
     safe_fallback_response,
     sanitize_response,
@@ -77,6 +78,7 @@ class AgentOrchestrator:
         ]
         tool_results: list[ToolResult] = []
         seen_tool_calls: dict[tuple[str, str], ToolResult] = {}
+        policy_auto_retrieved = False
         final_text: str | None = None
         handoff = False
 
@@ -139,6 +141,47 @@ class AgentOrchestrator:
                                 }
                             ],
                         )
+                    if (
+                        needs_policy_retrieval(message)
+                        and not any(item.name == "consultar_politicas" for item in tool_results)
+                        and not policy_auto_retrieved
+                    ):
+                        policy_result = self.tools.execute(
+                            "consultar_politicas",
+                            {"pergunta": message},
+                            session.session_id,
+                        )
+                        policy_auto_retrieved = True
+                        if policy_result.ok and policy_result.result.get("trechos"):
+                            tool_results.append(policy_result)
+                            context_lines = [
+                                f"[seção {trecho['secao']}, p. {trecho['pagina']}] "
+                                f"{trecho['trecho']}"
+                                for trecho in policy_result.result["trechos"]
+                            ]
+                            messages.append(
+                                {
+                                    "role": "system",
+                                    "content": (
+                                        "Contexto de políticas recuperado automaticamente. "
+                                        "Use somente estes trechos e cite a seção correspondente:\n"
+                                        + "\n".join(context_lines)
+                                    ),
+                                }
+                            )
+                            self.conversations.append_tool(
+                                session.session_id,
+                                content=json.dumps(
+                                    policy_result.result, ensure_ascii=False, default=str
+                                ),
+                                tool_calls=[
+                                    {
+                                        "name": "consultar_politicas",
+                                        "arguments": {"pergunta": message},
+                                        "ok": True,
+                                    }
+                                ],
+                            )
                     continue
                 final_text = response.content
                 break

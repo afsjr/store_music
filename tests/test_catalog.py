@@ -42,6 +42,12 @@ def test_discontinued_and_coming_soon(catalog):
     assert coming_soon is not None and coming_soon.status == "coming_soon"
 
 
+def test_search_with_singular_category(catalog):
+    products = catalog.search(category="violão", max_price=1000)
+    assert products
+    assert all(product.category_name == "Violões" for product in products)
+
+
 def test_search_without_results(catalog):
     assert catalog.search(term="produto-que-nao-existe") == []
 

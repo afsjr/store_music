@@ -22,6 +22,7 @@ def build_llm_client(settings: Settings):
             base_url=settings.openai_base_url,
             model=settings.llm_model or "gpt-4o-mini",
             timeout=settings.llm_timeout_seconds,
+            max_tokens=settings.llm_max_tokens,
         )
 
     if provider == "deepseek":
@@ -33,6 +34,7 @@ def build_llm_client(settings: Settings):
                     base_url=settings.openai_base_url,
                     model="gpt-4o-mini",
                     timeout=settings.llm_timeout_seconds,
+                    max_tokens=settings.llm_max_tokens,
                 )
             return UnavailableLLMClient("DEEPSEEK_API_KEY não configurada.")
         primary = OpenAICompatibleClient(
@@ -40,6 +42,8 @@ def build_llm_client(settings: Settings):
             base_url=settings.deepseek_base_url,
             model=settings.llm_model or "deepseek-flash",
             timeout=settings.llm_timeout_seconds,
+            max_tokens=settings.llm_max_tokens,
+            extra_body={"thinking": {"type": "enabled" if settings.llm_thinking else "disabled"}},
         )
         fallback = None
         if settings.openai_api_key:
@@ -48,6 +52,7 @@ def build_llm_client(settings: Settings):
                 base_url=settings.openai_base_url,
                 model="gpt-4o-mini",
                 timeout=settings.llm_timeout_seconds,
+                max_tokens=settings.llm_max_tokens,
             )
         return FallbackLLMClient(primary, fallback)
 

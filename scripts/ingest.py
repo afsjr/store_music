@@ -8,6 +8,9 @@ from datetime import date
 from pathlib import Path
 
 import pandas as pd
+from dotenv import load_dotenv
+
+load_dotenv()
 
 DATA_FILES = {
     "categories": "desafio_tecnico_ai_eng - categories.csv",
@@ -298,9 +301,10 @@ def _upsert(frames: dict[str, pd.DataFrame], db_url: str, counts: dict[str, int]
 
     with psycopg.connect(db_url) as conn:
         with conn.transaction():
-            conn.execute("insert into ingestion_runs (status) values ('running') returning id")
+            cur = conn.cursor()
+            cur.execute("insert into ingestion_runs (status) values ('running') returning id")
             categories = frames["categories"]
-            conn.executemany(
+            cur.executemany(
                 """
                 insert into categories (category_id, name, description)
                 values (%s, %s, %s)
@@ -314,7 +318,7 @@ def _upsert(frames: dict[str, pd.DataFrame], db_url: str, counts: dict[str, int]
                 ],
             )
             products = frames["products"]
-            conn.executemany(
+            cur.executemany(
                 """
                 insert into products (
                     product_id, name, price_brl, category_id, description,
@@ -346,7 +350,7 @@ def _upsert(frames: dict[str, pd.DataFrame], db_url: str, counts: dict[str, int]
                 ],
             )
             customers = frames["customers"]
-            conn.executemany(
+            cur.executemany(
                 """
                 insert into customers (customer_id, name, phone, email, city)
                 values (%s, %s, %s, %s, %s)
@@ -362,7 +366,7 @@ def _upsert(frames: dict[str, pd.DataFrame], db_url: str, counts: dict[str, int]
                 ],
             )
             orders = frames["orders"]
-            conn.executemany(
+            cur.executemany(
                 """
                 insert into orders (
                     order_id, customer_id, order_date, status, total_brl,
@@ -394,7 +398,7 @@ def _upsert(frames: dict[str, pd.DataFrame], db_url: str, counts: dict[str, int]
                 ],
             )
             items = frames["order_items"]
-            conn.executemany(
+            cur.executemany(
                 """
                 insert into order_items (order_id, product_id, quantity)
                 values (%s, %s, %s)
@@ -407,7 +411,7 @@ def _upsert(frames: dict[str, pd.DataFrame], db_url: str, counts: dict[str, int]
                 ],
             )
             promotions = frames["promotions"]
-            conn.executemany(
+            cur.executemany(
                 """
                 insert into promotions (promotion_id, product_id, discount_percent, description, is_active)
                 values (%s, %s, %s, %s, %s)
@@ -428,7 +432,7 @@ def _upsert(frames: dict[str, pd.DataFrame], db_url: str, counts: dict[str, int]
                     for row in promotions.itertuples()
                 ],
             )
-            conn.execute(
+            cur.execute(
                 """
                 update ingestion_runs
                 set finished_at = now(), status = 'success', counts = %s
