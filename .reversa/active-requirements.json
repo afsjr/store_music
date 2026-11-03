@@ -4,7 +4,9 @@
   "feature-id": "001",
   "short-name": "atendimento-mvp",
   "started-at": "2026-11-03T15:49:55.638701Z",
-  "current-stage": "requirements",
-  "stages-completed": [],
+  "current-stage": "plan",
+  "stages-completed": [
+    "requirements"
+  ],
   "paused-features": []
 }
