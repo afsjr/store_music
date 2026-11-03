@@ -3,15 +3,17 @@ from __future__ import annotations
 import logging
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, Field, ValidationError, model_validator
 
 from app.domain.format import format_brl
 from app.domain.models import ToolResult
 from app.domain.services.catalog import CatalogService
 from app.domain.services.conversations import ConversationService
 from app.domain.services.orders import STATUS_LABELS, OrderService
+from app.domain.services.payments import PaymentService
 from app.domain.services.policies import PolicyService
 from app.domain.services.shipping import ShippingService
+from app.domain.services.store_hours import StoreHoursService
 from app.logging import mask_email, mask_phone
 
 logger = logging.getLogger(__name__)
@@ -35,6 +37,31 @@ class ConsultarPromocaoArgs(BaseModel):
     produto_id: int
 
 
+class SimularPagamentoArgs(BaseModel):
+    produto_id: int | None = None
+    nome: str | None = None
+    forma: Literal["pix", "debito", "credito", "boleto"]
+    parcelas: int = Field(default=1, ge=1, le=12)
+
+    @model_validator(mode="after")
+    def _require_product(self) -> SimularPagamentoArgs:
+        if self.produto_id is None and not self.nome:
+            raise ValueError("Informe produto_id ou nome do produto.")
+        return self
+
+
+class BuscarAlternativasArgs(BaseModel):
+    produto_id: int | None = None
+    nome: str | None = None
+    limite: int = Field(default=3, ge=1, le=5)
+
+    @model_validator(mode="after")
+    def _require_product(self) -> BuscarAlternativasArgs:
+        if self.produto_id is None and not self.nome:
+            raise ValueError("Informe produto_id ou nome do produto.")
+        return self
+
+
 class IdentificarClienteArgs(BaseModel):
     nome: str = Field(min_length=2)
     contato: str = Field(min_length=3, description="Telefone ou e-mail do cliente")
@@ -54,6 +81,10 @@ class ConsultarPoliticasArgs(BaseModel):
 
 
 class InformacoesLojaArgs(BaseModel):
+    pass
+
+
+class StatusLojaArgs(BaseModel):
     pass
 
 
@@ -83,15 +114,20 @@ class ToolRegistry:
         self.policies = policies
         self.shipping = shipping
         self.conversations = conversations
+        self.payments = PaymentService()
+        self.hours = StoreHoursService()
         self._handlers = {
             "buscar_produtos": (BuscarProdutosArgs, self._buscar_produtos),
             "obter_produto": (ObterProdutoArgs, self._obter_produto),
             "consultar_promocao": (ConsultarPromocaoArgs, self._consultar_promocao),
+            "simular_pagamento": (SimularPagamentoArgs, self._simular_pagamento),
+            "buscar_alternativas": (BuscarAlternativasArgs, self._buscar_alternativas),
             "identificar_cliente": (IdentificarClienteArgs, self._identificar_cliente),
             "listar_pedidos_cliente": (ListarPedidosArgs, self._listar_pedidos_cliente),
             "consultar_pedido": (ConsultarPedidoArgs, self._consultar_pedido),
             "consultar_politicas": (ConsultarPoliticasArgs, self._consultar_politicas),
             "informacoes_loja": (InformacoesLojaArgs, self._informacoes_loja),
+            "status_loja": (StatusLojaArgs, self._status_loja),
             "calcular_frete": (CalcularFreteArgs, self._calcular_frete),
             "escalar_atendimento": (EscalarAtendimentoArgs, self._escalar_atendimento),
         }
@@ -163,11 +199,67 @@ class ToolRegistry:
                 "type": "function",
                 "function": {
                     "name": "consultar_promocao",
-                    "description": "Consulta a promoção ativa de um produto e o preço com PIX.",
+                    "description": (
+                        "Consulta a promoção ativa de um produto e o preço com PIX. Se não houver "
+                        "promoção ativa, retorna a última promoção expirada e o preço atual."
+                    ),
                     "parameters": {
                         "type": "object",
                         "properties": {"produto_id": {"type": "integer"}},
                         "required": ["produto_id"],
+                    },
+                },
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "simular_pagamento",
+                    "description": (
+                        "Calcula de forma determinística o valor no PIX, débito, crédito parcelado "
+                        "ou boleto. Use para qualquer pergunta de pagamento, desconto de PIX ou "
+                        "parcelamento. Informe produto_id ou nome e forma de pagamento."
+                    ),
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "produto_id": {"type": "integer"},
+                            "nome": {"type": "string"},
+                            "forma": {
+                                "type": "string",
+                                "enum": ["pix", "debito", "credito", "boleto"],
+                            },
+                            "parcelas": {
+                                "type": "integer",
+                                "default": 1,
+                                "minimum": 1,
+                                "maximum": 12,
+                            },
+                        },
+                        "required": ["forma"],
+                    },
+                },
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "buscar_alternativas",
+                    "description": (
+                        "Busca até 5 produtos semelhantes disponíveis na mesma categoria, "
+                        "ordenados por proximidade de preço. Use quando o produto estiver "
+                        "esgotado, descontinuado ou ainda não disponível."
+                    ),
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "produto_id": {"type": "integer"},
+                            "nome": {"type": "string"},
+                            "limite": {
+                                "type": "integer",
+                                "default": 3,
+                                "minimum": 1,
+                                "maximum": 5,
+                            },
+                        },
                     },
                 },
             },
@@ -239,6 +331,18 @@ class ToolRegistry:
                 "function": {
                     "name": "informacoes_loja",
                     "description": "Retorna endereço, telefone, WhatsApp, e-mail e horários da loja.",
+                    "parameters": {"type": "object", "properties": {}},
+                },
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "status_loja",
+                    "description": (
+                        "Informa se a loja está aberta agora, o horário de hoje e o próximo "
+                        "horário de atendimento. Use quando o cliente perguntar se está aberto "
+                        "ou quando o atendimento ocorrer fora do expediente."
+                    ),
                     "parameters": {"type": "object", "properties": {}},
                 },
             },
@@ -330,14 +434,36 @@ class ToolRegistry:
             in_stock=args.apenas_em_estoque,
             limit=args.limite,
         )
+        unavailable_mode = False
+        if not products and args.apenas_em_estoque and args.termo:
+            products = self.catalog.search(
+                term=args.termo,
+                category=args.categoria,
+                min_price=args.preco_min,
+                max_price=args.preco_max,
+                in_stock=False,
+                limit=args.limite,
+            )
+            unavailable_mode = bool(products)
+
         items = [self.catalog.to_dict(product) for product in products]
-        message = (
-            "Nenhum produto encontrado com esses filtros. Tente ampliar a faixa de preço ou "
-            "buscar outra categoria."
-            if not items
-            else f"Encontrei {len(items)} produto(s)."
-        )
-        return {"produtos": items, "quantidade": len(items), "mensagem": message}
+        payload: dict = {"produtos": items, "quantidade": len(items)}
+        if unavailable_mode and products:
+            alternatives = self.catalog.alternatives(products[0].product_id, limit=3)
+            payload["alternativas"] = [self.catalog.to_dict(item) for item in alternatives]
+            payload["mensagem"] = (
+                "Nenhum produto disponível com esses filtros. Encontrei modelo(s) fora de "
+                "estoque ou descontinuado(s) e separei até 3 alternativas disponíveis. "
+                "Apresente as alternativas ao cliente."
+            )
+        elif not items:
+            payload["mensagem"] = (
+                "Nenhum produto encontrado com esses filtros. Tente ampliar a faixa de preço "
+                "ou buscar outra categoria."
+            )
+        else:
+            payload["mensagem"] = f"Encontrei {len(items)} produto(s)."
+        return payload
 
     def _obter_produto(self, args: ObterProdutoArgs, _: str) -> dict:
         product = self.catalog.get(product_id=args.produto_id, name=args.nome)
@@ -351,17 +477,80 @@ class ToolRegistry:
             return {"erro": "Produto não encontrado."}
         promo = self.catalog.promotion(args.produto_id)
         data = self.catalog.to_dict(product)
-        if promo is None:
-            data["mensagem"] = "Não há promoção ativa para este produto."
-        else:
+        if promo is not None:
             data["promocao"] = {
                 "promotion_id": promo.promotion_id,
                 "descricao": promo.description,
                 "desconto_percentual": promo.discount_percent,
+                "preco_original": product.price_brl,
+                "preco_original_formatado": format_brl(product.price_brl),
                 "preco_promocional": product.effective_price,
                 "preco_promocional_formatado": format_brl(product.effective_price),
             }
+            data["mensagem"] = (
+                "Promoção ativa. Apresente preço original, percentual de desconto e preço "
+                "final. Promoções não são cumulativas com o desconto de PIX."
+            )
+            return data
+
+        expired = self.catalog.expired_promotion(args.produto_id)
+        if expired is not None:
+            data["promocao_expirada"] = {
+                "promotion_id": expired.promotion_id,
+                "descricao": expired.description,
+                "desconto_percentual": expired.discount_percent,
+                "preco_original": product.price_brl,
+                "preco_original_formatado": format_brl(product.price_brl),
+            }
+            data["preco_atual"] = product.price_brl
+            data["preco_atual_formatado"] = format_brl(product.price_brl)
+            data["mensagem"] = (
+                f"A promoção de {expired.discount_percent:.0f}% expirou. "
+                f"O preço atual é {format_brl(product.price_brl)}. "
+                "Não há rain check nem promessa de desconto retroativo."
+            )
+            return data
+
+        data["mensagem"] = "Não há promoção ativa nem promoção expirada para este produto."
         return data
+
+    def _simular_pagamento(self, args: SimularPagamentoArgs, _: str) -> dict:
+        product = self.catalog.get(product_id=args.produto_id, name=args.nome)
+        if product is None:
+            return {"erro": "Produto não encontrado."}
+        simulation = self.payments.simulate(product, args.forma, args.parcelas)
+        data = simulation.model_dump()
+        data["preco_tabela_formatado"] = format_brl(simulation.preco_tabela)
+        data["preco_base_formatado"] = format_brl(simulation.preco_base)
+        data["preco_final_formatado"] = format_brl(simulation.preco_final)
+        data["total_formatado"] = format_brl(simulation.total)
+        if simulation.valor_parcela is not None:
+            data["valor_parcela_formatado"] = format_brl(simulation.valor_parcela)
+        return data
+
+    def _buscar_alternativas(self, args: BuscarAlternativasArgs, _: str) -> dict:
+        product = self.catalog.get(product_id=args.produto_id, name=args.nome)
+        if product is None:
+            return {"erro": "Produto não encontrado."}
+        alternatives = self.catalog.alternatives(product.product_id, args.limite)
+        if not product.available and alternatives:
+            message = (
+                "O produto está indisponível. Encontrei estas alternativas disponíveis na "
+                "mesma categoria."
+            )
+        elif not product.available:
+            message = (
+                "O produto está indisponível e não encontrei alternativas disponíveis na "
+                "mesma categoria."
+            )
+        else:
+            message = "O produto está disponível. Estas são opções semelhantes do catálogo."
+        return {
+            "produto": self.catalog.to_dict(product),
+            "alternativas": [self.catalog.to_dict(item) for item in alternatives],
+            "quantidade": len(alternatives),
+            "mensagem": message,
+        }
 
     def _identificar_cliente(self, args: IdentificarClienteArgs, _: str) -> dict:
         matches = self.orders.identify(args.nome, args.contato)
@@ -448,10 +637,34 @@ class ToolRegistry:
 
     def _informacoes_loja(self, _: InformacoesLojaArgs, __: str) -> dict:
         data = self.policies.store_info_to_dict()
+        status = self.hours.status()
+        data["status_agora"] = {
+            "aberto": status.aberto,
+            "mensagem": status.mensagem,
+            "proxima_abertura": (
+                status.proxima_abertura.strftime("%d/%m/%Y %H:%M")
+                if status.proxima_abertura
+                else None
+            ),
+        }
         data["citacoes"] = [
             {"section": "1.2", "page": 2, "source": "Manual de Políticas"},
             {"section": "2", "page": 2, "source": "Manual de Políticas"},
             {"section": "7", "page": 6, "source": "Manual de Políticas"},
+        ]
+        return data
+
+    def _status_loja(self, _: StatusLojaArgs, __: str) -> dict:
+        status = self.hours.status()
+        data = status.model_dump()
+        data["agora"] = status.agora.strftime("%d/%m/%Y %H:%M")
+        data["proxima_abertura"] = (
+            status.proxima_abertura.strftime("%d/%m/%Y %H:%M") if status.proxima_abertura else None
+        )
+        data["horarios"] = self.policies.store_info().hours
+        data["citacoes"] = [
+            {"section": "2", "page": 2, "source": "Manual de Políticas"},
+            {"section": "7.1", "page": 6, "source": "Manual de Políticas"},
         ]
         return data
 

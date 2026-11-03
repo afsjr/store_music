@@ -122,6 +122,34 @@ class ShippingQuote(DomainModel):
     message: str
 
 
+class PaymentSimulation(DomainModel):
+    forma: Literal["pix", "debito", "credito", "boleto"]
+    preco_tabela: float
+    promocao_ativa: bool = False
+    desconto_promocional_percent: float | None = None
+    preco_base: float
+    desconto_pix_percent: float = 0.0
+    desconto_pix_valor: float = 0.0
+    preco_final: float
+    parcelas_solicitadas: int = 1
+    parcelas_maximas: int = 1
+    valor_parcela: float | None = None
+    total: float
+    permite_combinacao: bool = False
+    observacoes: list[str] = Field(default_factory=list)
+    mensagem: str = ""
+
+
+class StoreStatus(DomainModel):
+    aberto: bool
+    agora: datetime
+    dia_semana: str
+    horario_hoje: str
+    proxima_abertura: datetime | None = None
+    mensagem: str
+    observacao_datas_especiais: str = ""
+
+
 class Message(DomainModel):
     role: MessageRole
     content: str
