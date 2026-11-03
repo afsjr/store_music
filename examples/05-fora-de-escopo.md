@@ -4,4 +4,4 @@
 
 **Cliente:** Vocês vendem cordas de violão?
 
-**Agente:** A Empório da Música trabalha apenas com instrumentos musicais e não comercializa acessórios como cordas, palhetas, cabos, cases, pedais ou amplificadores. Posso te ajudar a encontrar um instrumento ou indicar uma loja parceira para o acessório.
+**Agente:** A Empório da Música trabalha apenas com instrumentos musicais e não comercializa acessórios como cordas, palhetas, cabos, cases, pedais ou amplificadores. Posso ajudar a encontrar um instrumento ou encaminhar seu contato para a equipe, que pode orientar sobre onde encontrar o acessório.

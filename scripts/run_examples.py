@@ -17,7 +17,7 @@ SCENARIOS = [
     (
         "02-preco-promocao",
         "Preço e promoção",
-        ["Quanto custa o Takamine GD20? Tem alguma promoção ativa?"],
+        ["Quanto custa o Takamine GD20? Tem alguma promoção ativa? Como fica no PIX e em 6x?"],
     ),
     (
         "03-pedido",

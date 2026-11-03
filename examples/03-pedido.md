@@ -11,7 +11,7 @@
 - Código de rastreio: BRJL5544332BR
 - Previsão de entrega: 28/02/2026
 
-Os prazos de troca, devolução e garantia passam a contar a partir do recebimento do produto (Manual de Políticas, seções 4.1, 4.2 e 8.1, pág. 4 e 7).
+Os prazos de troca e garantia passam a contar a partir do recebimento do produto (Manual de Políticas, seções 4.1 e 4.2, pág. 4).
 
 Precisa de mais alguma coisa?
-*Fontes: Manual, seção 4.1, p. 4, Manual, seção 4.2, p. 4, Manual, seção 8.1, p. 7*
+*Fontes: Manual, seção 4.1, p. 4, Manual, seção 4.2, p. 4*

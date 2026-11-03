@@ -8,6 +8,9 @@ Agente de atendimento por mensagens de texto para a Empório da Música, loja fi
 
 - Busca instrumentos por termo, categoria e faixa de preço.
 - Informa preço de tabela, promoção ativa, preço com PIX, estoque e status do produto.
+- Simula pagamento no PIX, débito, crédito parcelado e boleto com regras determinísticas.
+- Informa se a loja está aberta agora e o próximo horário de atendimento.
+- Sugere até 3 alternativas disponíveis para produto esgotado ou descontinuado.
 - Identifica o cliente e consulta somente os pedidos vinculados a ele.
 - Responde status, itens, rastreio, previsão de entrega e prazos de devolução/garantia.
 - Responde políticas de horário, endereço, contato, pagamento, troca, devolução, garantia, promoções e frete.
@@ -17,11 +20,11 @@ Agente de atendimento por mensagens de texto para a Empório da Música, loja fi
 
 ## O que o agente não faz
 
-- Não cria pedido, não reserva estoque e não processa pagamento.
+- Não cria pedido, não reserva estoque e não processa pagamento real.
 - Não vende acessórios (cordas, palhetas, cabos, cases, pedais, amplificadores).
 - Não calcula frete fora da regra conhecida; nesses casos, informa que é sob cotação.
 - Não compartilha dados de outros clientes.
-- Não promete desconto expirado, `rain check` ou condição fora do manual.
+- Não promete desconto expirado, `rain check`, lista de lojas parceiras ou condição fora do manual.
 - Não tem integração real com WhatsApp nesta versão.
 
 ## Arquitetura
@@ -33,6 +36,8 @@ flowchart LR
   Agent --> LLM[DeepSeek / OpenAI]
   Agent --> Tools[ToolRegistry]
   Tools --> Catalog[Catálogo e promoções]
+  Tools --> Payments[Pagamento e parcelamento]
+  Tools --> Hours[Horário e status da loja]
   Tools --> Orders[Pedidos e clientes]
   Tools --> Policies[Políticas e frete]
   Tools --> Handoff[Escalonamento]
@@ -122,6 +127,28 @@ Suposições registradas:
 - O frete local é grátis a partir de R$ 500,00. O manual diz “acima de R$ 500,00”; o limite exato de R$ 500,00 foi tratado como gratuito.
 - A loja tem dois telefones no manual; a v1 usa o WhatsApp `(67) 3321-4500` para contato e `(67) 3341-4444` como telefone fixo.
 - “Histórico de negociação” foi interpretado como histórico de conversas e escalonamentos.
+- Pagamento: compras abaixo de R$ 50,00 só podem ser pagas em 1x; 4x–6x exigem parcela mínima de R$ 80,00; 7x–12x exigem R$ 100,00; a combinação PIX + cartão acima de R$ 2.000,00 é apenas informativa, sem cálculo automático.
+- Promoções expiradas: como o CSV não tem data de validade, `is_active = 0` e o maior `promotion_id` identificam a última promoção conhecida.
+- Horário: o status usa o fuso `America/Campo_Grande` e os horários regulares do manual; feriados e datas especiais não estão no calendário e são informados como limitação.
+- Catálogo: o agente conhece os 65 produtos fornecidos, não os 300+ instrumentos citados no manual.
+- Itens com “venda final” ou personalização não têm flag nos CSVs; quando o caso exigir essa distinção, o agente informa a limitação e oferece escalonamento.
+- Garantia do fabricante varia por produto e não está na base; o agente cita a garantia legal e orienta a consultar o certificado.
+
+## Cobertura das políticas
+
+| Seção do manual | Como é tratada | Teste |
+|---|---|---|
+| 1, 1.1, 1.2 — empresa e fundação | `informacoes_loja` + RAG | `test_policy_coverage` |
+| 2 — horário e fora do expediente | `status_loja` + RAG | `test_store_hours` |
+| 3 e 3.1 — pagamento e parcelamento | `simular_pagamento` determinístico | `test_payments` |
+| 4.1 e 4.2 — arrependimento e defeito | `OrderService` + RAG | `test_orders` |
+| 4.3 e 4.4 — preferência e itens não elegíveis | RAG + prompt; dados insuficientes geram escalonamento | `test_policy_coverage` |
+| 5.1 — frete local | `calcular_frete` | `test_tools` |
+| 5.2 e 5.3 — outras cidades e rastreamento | RAG + cotação + dados do pedido | `test_policy_coverage` |
+| 6.1 e 6.2 — promoções e regras | `consultar_promocao` + prompt | `test_promotions` |
+| 7.1 e 7.3 — atendimento e situações especiais | `status_loja`, `buscar_alternativas` + RAG | `test_store_hours`, `test_alternatives` |
+| 8.1, 8.2 e 8.3 — garantia | `consultar_pedido` + RAG | `test_policy_coverage` |
+| 9 — LGPD | RAG + guardrails de privacidade | `test_policy_coverage`, `test_tools` |
 
 ## Como rodar
 
@@ -137,11 +164,11 @@ Suposições registradas:
 ```bash
 git clone https://github.com/afsjr/store_music.git
 cd store_music
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+make setup
 cp .env.example .env
 ```
+
+O `requirements.txt` fixa `pypdfium2==5.11.0` para manter o wheel compatível com macOS 12 x86_64; versões 5.12+ exigem macOS 13 e tentam compilar via download com SSL. Em Linux, macOS 13+ e Windows, o wheel correspondente é usado normalmente.
 
 Edite `.env`:
 
@@ -192,9 +219,9 @@ O comando gera `data/policy_chunks.json` e `docs/policy_index_summary.md`. A apl
 
 - Schema aplicado no Supabase e ingestão concluída com as contagens 9, 65, 50, 20, 22 e 25.
 - `GET /health` em modo Supabase retornou `200` com `database: ok` e `llm: ok`.
-- DeepSeek real validado em catálogo, consulta de pedido e devolução.
+- DeepSeek real validado em catálogo, consulta de pedido, devolução, pagamento e horário.
 - Exemplos em `examples/` gerados pelo agente real com `STORE_TODAY=2026-02-20`.
-- 53 testes automatizados passando; lint e format limpos.
+- 151 testes automatizados passando; lint e format limpos.
 
 ### Subir a aplicação
 
@@ -255,10 +282,10 @@ Erros principais: `422` para mensagem inválida, `429` para rate limit, `503` qu
 | Arquivo | Cenário |
 |---|---|
 | [`examples/01-catalogo.md`](examples/01-catalogo.md) | Busca de violões até R$ 1.000 e detalhe de estoque. |
-| [`examples/02-preco-promocao.md`](examples/02-preco-promocao.md) | Preço, PIX e parcelamento do Takamine GD20. |
+| [`examples/02-preco-promocao.md`](examples/02-preco-promocao.md) | Preço, promoção expirada, PIX e parcelamento do Takamine GD20. |
 | [`examples/03-pedido.md`](examples/03-pedido.md) | Identificação e consulta do pedido 8. |
 | [`examples/04-devolucao.md`](examples/04-devolucao.md) | Aplicação da política de arrependimento em 7 dias. |
-| [`examples/05-fora-de-escopo.md`](examples/05-fora-de-escopo.md) | Recusa de acessórios e redirecionamento. |
+| [`examples/05-fora-de-escopo.md`](examples/05-fora-de-escopo.md) | Recusa de acessórios sem prometer lista de parceiros, com encaminhamento à equipe. |
 
 Os exemplos 3 e 4 são reproduzíveis com `STORE_TODAY=2026-02-20`. Para gerar transcrições com o agente real, configure a chave e rode `make examples`.
 
@@ -270,7 +297,7 @@ ruff check app scripts tests
 ruff format --check app scripts tests
 ```
 
-A suíte cobre catálogo, promoções, PIX, pedidos, privacidade, prazos, RAG, ferramentas, guardrails, loop do agente, API e ingestão. São **53 testes**, todos passando sem credenciais externas.
+A suíte cobre catálogo, promoções, PIX, parcelamento, horário, alternativas, fora de escopo, pedidos, privacidade, prazos, RAG, ferramentas, guardrails, loop do agente, API e ingestão. São **151 testes**, todos passando sem credenciais externas.
 
 ## Estrutura do projeto
 
@@ -312,14 +339,19 @@ O projeto usou o Reversa como workflow de especificação:
 ## Limitações e próximos passos
 
 - Sem integração real com WhatsApp; a UI é uma simulação.
-- Sem criação de pedido, carrinho ou pagamento.
+- Sem criação de pedido, carrinho ou processamento real de pagamento; `simular_pagamento` apenas calcula condições.
 - Sem streaming token a token; a resposta é retornada completa.
 - RAG lexical; embeddings e benchmark de retrieval ficam como evolução.
 - Histórico em memória é perdido ao reiniciar quando o Supabase não está configurado.
+- O SLA de 5 minutos do manual não é monitorado; o agente informa o próximo horário de atendimento, mas não mede fila ou tempo real.
+- Feriados e horários especiais não estão no calendário; o agente informa a limitação e não inventa exceções.
+- O catálogo cobre os 65 produtos fornecidos, não os 300+ instrumentos citados no manual.
+- Não há CEP, peso ou dimensões por produto; frete fora da região metropolitana fica sob cotação.
+- Não há garantia específica por fabricante, lista de lojas parceiras nem flags de “venda final” ou personalização nos CSVs.
 - Dados têm inconsistências documentadas; não foram corrigidos automaticamente.
 - Latência medida de **10,71 s (DeepSeek)** e **11,68 s (OpenAI)** na mediana do benchmark, acima do alvo de 8 s do PRD; o provedor domina o tempo.
 - O benchmark cobre 3 cenários e 3 execuções por cenário; uma avaliação maior com 20–30 cenários fica como próximo passo.
-- Próximos passos: criar pedido, integrar WhatsApp, adicionar embeddings, cache de respostas e avaliar custo/latência com dados reais.
+- Próximos passos: criar pedido, integrar WhatsApp, adicionar embeddings, cache de respostas, ampliar o catálogo e avaliar custo/latência com dados reais.
 
 ## Uso de assistentes de IA
 
