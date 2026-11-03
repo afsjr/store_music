@@ -1,0 +1,15 @@
+flowchart LR
+  UI[UI web] --> API[FastAPI]
+  API --> Agent[AgentOrchestrator]
+  Agent --> LLM[DeepSeek / OpenAI]
+  Agent --> Tools[ToolRegistry]
+  Tools --> Catalog[Catálogo e promoções]
+  Tools --> Payments[Pagamento e parcelamento]
+  Tools --> Hours[Horário e status da loja]
+  Tools --> Orders[Pedidos e clientes]
+  Tools --> Policies[Políticas e frete]
+  Tools --> Handoff[Escalonamento]
+  Catalog --> Store[(Supabase ou memória)]
+  Orders --> Store
+  Policies --> RAG[BM25 por seção]
+  RAG --> PDF[Manual de políticas]

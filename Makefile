@@ -1,4 +1,4 @@
-.PHONY: setup ingest index run test lint format examples benchmark
+.PHONY: setup ingest index run test lint format examples benchmark docs-setup docs-pdf
 
 setup:
 	python3 -m venv .venv
@@ -28,3 +28,9 @@ examples:
 
 benchmark:
 	.venv/bin/python -m scripts.benchmark_llm
+
+docs-setup:
+	.venv/bin/pip install -r requirements-docs.txt
+
+docs-pdf:
+	.venv/bin/python -m scripts.build_docs_pdf
