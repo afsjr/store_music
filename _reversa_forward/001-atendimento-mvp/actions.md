@@ -9,8 +9,8 @@
 | Métrica | Valor |
 |---------|-------|
 | Total de ações | 30 |
-| Paralelizáveis (`[//]`) | 12 |
-| Maior cadeia de dependência | 6 |
+| Paralelizáveis (`[//]`) | 17 |
+| Maior cadeia de dependência | 8 |
 
 ## Fase 1, Preparação
 
