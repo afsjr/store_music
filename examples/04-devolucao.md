@@ -4,20 +4,18 @@
 
 **Cliente:** Meu nome é Letícia Gonçalves Rocha, telefone (67) 99789-0123. Me arrependi da compra do pedido 7. Posso devolver?
 
-**Agente:** Claro, Letícia, você pode devolver sim.
+**Agente:** Letícia, identifiquei seu pedido 7 e ele está dentro do prazo de arrependimento.
 
-Conferi o pedido 7 aqui no sistema:
-- Produto: Shelby SU-21S Soprano Sunburst (1 unidade)
-- Valor: R$ 159,90, pago em cartão de crédito em 3x
-- Status: entregue em 17/02/2026
-- Como o recebimento foi há 3 dias, você está dentro do prazo de arrependimento, que vai até 24/02/2026
+- Pedido 7, feito em 03/02/2026, entregue em 17/02/2026
+- Item: Shelby SU-21S Soprano Sunburst — R$ 159,90
+- Hoje são 3 dias corridos desde o recebimento, então você tem direito à devolução por arrependimento (prazo de até 7 dias corridos após o recebimento)
 
-Condições da devolução por arrependimento:
-- Produto na embalagem original, sem sinais de uso, com todos os acessórios e manuais
-- O reembolso é feito na mesma forma de pagamento original, em até 10 dias úteis
-- O frete de devolução fica por conta da loja
+Condições:
+- O produto precisa estar na embalagem original, sem sinais de uso, com todos os acessórios e manuais.
+- O reembolso é feito na mesma forma de pagamento (cartão de crédito em 3x) em até 10 dias úteis.
+- O frete de devolução fica por conta da loja.
 
-Uma observação: o produto não é de liquidação com aviso de venda final nem se enquadra nas exceções de troca, então está elegível.
+Uma observação: se o instrumento tiver recebido ajuste sob encomenda (setup ou regulagem especial), ele não é elegível para troca. Se for o caso, me avise.
 
-Quer que eu já encaminhe a solicitação de devolução para a nossa equipe dar andamento?
-*Fontes: Manual, seção 4.1, p. 4, Manual, seção 4.4, p. 4, Manual, seção 4.2, p. 4*
+Quer que eu encaminhe sua solicitação de devolução para nossa equipe dar seguimento? (Seção 4.1, p. 4 — Manual de Políticas)
+*Fontes: Manual, seção 4.1, p. 4*

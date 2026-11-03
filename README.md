@@ -63,6 +63,7 @@ O domínio não conhece FastAPI, Supabase, PDF ou provedor de LLM. As ferramenta
 | Abordagem | Function calling + serviços determinísticos + RAG | Evita agente SQL livre e reduz alucinação de preço, estoque e prazo. |
 | LLM padrão | DeepSeek Flash | Melhor custo-benefício, contexto de 1M e suporte a tool calls. |
 | Fallback | OpenAI `gpt-4o-mini` | Tool calling previsível e mesmo patamar de preço. |
+| Thinking mode | Desativado por padrão | Reduz latência e custo; pode ser ativado com `LLM_THINKING=true`. |
 | Dados | Supabase Postgres | Requisito do usuário; permite SQL completo e histórico. |
 | Fallback local | CSVs em memória | Testes e demonstração sem credenciais. |
 | RAG | BM25 por seção | Manual de 8 páginas; sem custo extra e com citação de seção/página. |
@@ -82,6 +83,8 @@ Valores de tabela consultados em 03/11/2026:
 
 **Decisão:** DeepSeek Flash como padrão, OpenAI `gpt-4o-mini` como fallback. Gemini fica documentado como alternativa gratuita para desenvolvimento. O custo estimado de uma conversa de 4 turnos é de **US$ 0,001 a 0,002** no DeepSeek/OpenAI e **zero** no Gemini free tier.
 
+Nos testes locais com DeepSeek em modo não-thinking, uma conversa de catálogo ou devolução ficou em **~9 a 12 segundos** (2 a 3 chamadas ao modelo). A meta de 8 s do PRD depende da latência do provedor; `LLM_MAX_TOKENS`, respostas curtas e o fallback OpenAI ajudam a ajustar esse trade-off.
+
 ### RAG
 
 O manual tem 8 páginas e seções numeradas. A estratégia implementada:
@@ -92,6 +95,7 @@ O manual tem 8 páginas e seções numeradas. A estratégia implementada:
 4. Normalização de acentos e caixa.
 5. Índice BM25 em memória, com expansão de sinônimos para devolução, troca, frete, pagamento, horário e garantia.
 6. Top-3 trechos com seção e página para citação.
+7. Recuperação automática quando a pergunta contém termos de política, mesmo que o modelo não chame a ferramenta.
 
 ## Dados e suposições
 
@@ -139,6 +143,8 @@ POLICY_PDF=emporio_musica/data/políticas_da_loja.pdf
 POLICY_CACHE=data/policy_chunks.json
 LLM_PROVIDER=deepseek
 LLM_MODEL=deepseek-flash
+LLM_MAX_TOKENS=800
+LLM_THINKING=false
 DEEPSEEK_API_KEY=sua-chave
 OPENAI_API_KEY=
 SUPABASE_DB_URL=
@@ -171,6 +177,14 @@ python -m scripts.build_policy_index
 ```
 
 O comando gera `data/policy_chunks.json` e `docs/policy_index_summary.md`. A aplicação carrega o cache no startup; se ele não existir, extrai do PDF.
+
+### Validação realizada
+
+- Schema aplicado no Supabase e ingestão concluída com as contagens 9, 65, 50, 20, 22 e 25.
+- `GET /health` em modo Supabase retornou `200` com `database: ok` e `llm: ok`.
+- DeepSeek real validado em catálogo, consulta de pedido e devolução.
+- Exemplos em `examples/` gerados pelo agente real com `STORE_TODAY=2026-02-20`.
+- 50 testes automatizados passando; lint e format limpos.
 
 ### Subir a aplicação
 
@@ -245,7 +259,7 @@ ruff check app scripts tests
 ruff format --check app scripts tests
 ```
 
-A suíte cobre catálogo, promoções, PIX, pedidos, privacidade, prazos, RAG, ferramentas, guardrails, loop do agente, API e ingestão. Todos os testes passam sem credenciais externas.
+A suíte cobre catálogo, promoções, PIX, pedidos, privacidade, prazos, RAG, ferramentas, guardrails, loop do agente, API e ingestão. São **50 testes**, todos passando sem credenciais externas.
 
 ## Estrutura do projeto
 
@@ -292,8 +306,9 @@ O projeto usou o Reversa como workflow de especificação:
 - RAG lexical; embeddings e benchmark de retrieval ficam como evolução.
 - Histórico em memória é perdido ao reiniciar quando o Supabase não está configurado.
 - Dados têm inconsistências documentadas; não foram corrigidos automaticamente.
-- Benchmark de LLMs com 20–30 cenários não foi executado por falta de chaves no ambiente.
-- Próximos passos: criar pedido, integrar WhatsApp, adicionar embeddings e avaliar custo/latência com dados reais.
+- Latência medida de ~9 a 12 s com DeepSeek não-thinking, acima do alvo de 8 s do PRD; o provedor domina o tempo.
+- Benchmark formal de LLMs com 20–30 cenários não foi executado; a validação foi funcional com DeepSeek e OpenAI.
+- Próximos passos: criar pedido, integrar WhatsApp, adicionar embeddings, cache de respostas e avaliar custo/latência com dados reais.
 
 ## Uso de assistentes de IA
 
