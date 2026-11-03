@@ -1,0 +1,30 @@
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T001", "status": "done", "files": ["pyproject.toml", "requirements.txt", ".env.example", "Makefile"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T002", "status": "done", "files": ["app/config.py", "app/logging.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T003", "status": "done", "files": ["app/domain/models.py", "app/domain/ports.py", "app/domain/store_info.py", "app/domain/format.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T004", "status": "done", "files": ["app/adapters/memory/store.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T005", "status": "done", "files": ["supabase/migrations/001_schema.sql"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T006", "status": "done", "files": ["app/adapters/supabase/store.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T007", "status": "done", "files": ["app/adapters/rag/pdf_loader.py", "app/adapters/rag/bm25.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T008", "status": "done", "files": ["app/adapters/llm/base.py", "app/adapters/llm/openai_compatible.py", "app/adapters/llm/factory.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T009", "status": "done", "files": ["tests/test_catalog.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T010", "status": "done", "files": ["tests/test_orders.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T011", "status": "done", "files": ["tests/test_policies.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T012", "status": "done", "files": ["tests/test_tools.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T013", "status": "done", "files": ["tests/test_agent.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T014", "status": "done", "files": ["tests/test_api.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T015", "status": "done", "files": ["app/domain/services/catalog.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T016", "status": "done", "files": ["app/domain/services/orders.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T017", "status": "done", "files": ["app/domain/services/policies.py", "app/domain/services/shipping.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T018", "status": "done", "files": ["app/agent/tools.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T019", "status": "done", "files": ["app/agent/guardrails.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T020", "status": "done", "files": ["app/agent/orchestrator.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T021", "status": "done", "files": ["app/domain/services/conversations.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T022", "status": "done", "files": ["app/api/schemas.py", "app/api/routes.py", "app/api/deps.py", "app/main.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T023", "status": "done", "files": ["app/web/index.html", "app/web/styles.css", "app/web/app.js"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T024", "status": "done", "files": ["scripts/ingest.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T025", "status": "done", "files": ["scripts/build_policy_index.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T026", "status": "done", "files": ["scripts/run_examples.py", "examples/01-catalogo.md", "examples/02-preco-promocao.md", "examples/03-pedido.md", "examples/04-devolucao.md", "examples/05-fora-de-escopo.md"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T027", "status": "done", "files": ["app/logging.py", "app/main.py", "app/api/routes.py"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T028", "status": "done", "files": ["README.md"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T029", "status": "done", "files": [".env.example", "Makefile", "docs/data_quality_report.md", "docs/policy_index_summary.md"]}
+{"ts": "2026-11-03T17:00:18.579127Z", "action": "T030", "status": "done", "files": ["tests/", "README.md", "data/policy_chunks.json"]}
