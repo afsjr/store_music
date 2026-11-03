@@ -69,6 +69,11 @@
 
 ## Notas de execução
 
+- Validação real com Supabase e DeepSeek em 2026-11-03.
+- Ingestão concluída: 9 categorias, 65 produtos, 50 clientes, 20 pedidos, 22 itens e 25 promoções.
+- Ajustes pós-validação: pool de conexões Supabase, thinking desativado, recuperação automática de políticas, limite de 5 itens por resposta e citação de seção/página.
+- 50 testes automatizados passando; lint e format limpos.
+
 ## Histórico de alterações
 
 | Data | Alteração | Autor |

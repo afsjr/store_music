@@ -28,3 +28,9 @@
 {"ts": "2026-11-03T17:00:18.579127Z", "action": "T028", "status": "done", "files": ["README.md"]}
 {"ts": "2026-11-03T17:00:18.579127Z", "action": "T029", "status": "done", "files": [".env.example", "Makefile", "docs/data_quality_report.md", "docs/policy_index_summary.md"]}
 {"ts": "2026-11-03T17:00:18.579127Z", "action": "T030", "status": "done", "files": ["tests/", "README.md", "data/policy_chunks.json"]}
+{"ts": "2026-11-03T18:25:35.818833Z", "action": "T006", "status": "corrected", "files": ["app/adapters/supabase/store.py"], "note": "pool de conexões para reduzir latência"}
+{"ts": "2026-11-03T18:25:35.818833Z", "action": "T008", "status": "corrected", "files": ["app/adapters/llm/openai_compatible.py", "app/adapters/llm/factory.py"], "note": "thinking desativado e limite de tokens"}
+{"ts": "2026-11-03T18:25:35.818833Z", "action": "T019", "status": "corrected", "files": ["app/agent/guardrails.py", "app/agent/orchestrator.py"], "note": "recuperação automática de políticas e preservação de contatos da loja"}
+{"ts": "2026-11-03T18:25:35.818833Z", "action": "T020", "status": "corrected", "files": ["app/agent/orchestrator.py"], "note": "deduplicação de tool calls e filtro de citações"}
+{"ts": "2026-11-03T18:25:35.818833Z", "action": "T026", "status": "corrected", "files": ["examples/"], "note": "exemplos regenerados com DeepSeek real"}
+{"ts": "2026-11-03T18:25:35.818833Z", "action": "T030", "status": "corrected", "files": ["README.md", "tests/"], "note": "validação final com Supabase e 50 testes"}
