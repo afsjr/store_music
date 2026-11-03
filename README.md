@@ -83,7 +83,16 @@ Valores de tabela consultados em 03/11/2026:
 
 **Decisão:** DeepSeek Flash como padrão, OpenAI `gpt-4o-mini` como fallback. Gemini fica documentado como alternativa gratuita para desenvolvimento. O custo estimado de uma conversa de 4 turnos é de **US$ 0,001 a 0,002** no DeepSeek/OpenAI e **zero** no Gemini free tier.
 
-Nos testes locais com DeepSeek em modo não-thinking, uma conversa de catálogo ou devolução ficou em **~9 a 12 segundos** (2 a 3 chamadas ao modelo). A meta de 8 s do PRD depende da latência do provedor; `LLM_MAX_TOKENS`, respostas curtas e o fallback OpenAI ajudam a ajustar esse trade-off.
+### Benchmark de latência
+
+Executado em 03/11/2026 com 3 execuções por cenário (catálogo, pedido e devolução), Supabase, DeepSeek sem thinking e `max_tokens=800`. Relatório completo em [`docs/llm_benchmark.md`](docs/llm_benchmark.md).
+
+| Provedor | Mediana | Média | Sucesso |
+|---|---:|---:|---:|
+| DeepSeek | 10,71 s | 11,80 s | 9/9 |
+| OpenAI `gpt-4o-mini` | 11,68 s | 12,29 s | 9/9 |
+
+**Decisão:** manter **DeepSeek como primário** e **OpenAI como fallback**. A diferença de mediana foi de aproximadamente 1 segundo, e ambos acertaram todos os cenários. O fallback é acionado automaticamente em erro, timeout ou indisponibilidade do primário.
 
 ### RAG
 
@@ -142,7 +151,8 @@ DATA_DIR=emporio_musica/data
 POLICY_PDF=emporio_musica/data/políticas_da_loja.pdf
 POLICY_CACHE=data/policy_chunks.json
 LLM_PROVIDER=deepseek
-LLM_MODEL=deepseek-flash
+DEEPSEEK_MODEL=deepseek-flash
+OPENAI_MODEL=gpt-4o-mini
 LLM_MAX_TOKENS=800
 LLM_THINKING=false
 DEEPSEEK_API_KEY=sua-chave
@@ -184,7 +194,7 @@ O comando gera `data/policy_chunks.json` e `docs/policy_index_summary.md`. A apl
 - `GET /health` em modo Supabase retornou `200` com `database: ok` e `llm: ok`.
 - DeepSeek real validado em catálogo, consulta de pedido e devolução.
 - Exemplos em `examples/` gerados pelo agente real com `STORE_TODAY=2026-02-20`.
-- 50 testes automatizados passando; lint e format limpos.
+- 53 testes automatizados passando; lint e format limpos.
 
 ### Subir a aplicação
 
@@ -205,6 +215,7 @@ make test
 make lint
 make format
 make examples
+make benchmark
 ```
 
 ## API
@@ -259,7 +270,7 @@ ruff check app scripts tests
 ruff format --check app scripts tests
 ```
 
-A suíte cobre catálogo, promoções, PIX, pedidos, privacidade, prazos, RAG, ferramentas, guardrails, loop do agente, API e ingestão. São **50 testes**, todos passando sem credenciais externas.
+A suíte cobre catálogo, promoções, PIX, pedidos, privacidade, prazos, RAG, ferramentas, guardrails, loop do agente, API e ingestão. São **53 testes**, todos passando sem credenciais externas.
 
 ## Estrutura do projeto
 
@@ -271,9 +282,9 @@ app/
   domain/          # entidades, portas e serviços
   web/             # UI de chat
 data/              # cache do índice de políticas
-docs/              # qualidade dos dados e resumo do índice
+docs/              # qualidade dos dados, índice e benchmark de LLMs
 examples/          # 5 conversas de referência
-scripts/           # ingestão, índice e runner de exemplos
+scripts/           # ingestão, índice, benchmark e runner de exemplos
 supabase/          # migrations SQL
 tests/             # testes automatizados
 _reversa_sdd/      # PRD e specs SDD geradas pelo Reversa
@@ -306,8 +317,8 @@ O projeto usou o Reversa como workflow de especificação:
 - RAG lexical; embeddings e benchmark de retrieval ficam como evolução.
 - Histórico em memória é perdido ao reiniciar quando o Supabase não está configurado.
 - Dados têm inconsistências documentadas; não foram corrigidos automaticamente.
-- Latência medida de ~9 a 12 s com DeepSeek não-thinking, acima do alvo de 8 s do PRD; o provedor domina o tempo.
-- Benchmark formal de LLMs com 20–30 cenários não foi executado; a validação foi funcional com DeepSeek e OpenAI.
+- Latência medida de **10,71 s (DeepSeek)** e **11,68 s (OpenAI)** na mediana do benchmark, acima do alvo de 8 s do PRD; o provedor domina o tempo.
+- O benchmark cobre 3 cenários e 3 execuções por cenário; uma avaliação maior com 20–30 cenários fica como próximo passo.
 - Próximos passos: criar pedido, integrar WhatsApp, adicionar embeddings, cache de respostas e avaliar custo/latência com dados reais.
 
 ## Uso de assistentes de IA

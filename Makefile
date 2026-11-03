@@ -1,4 +1,4 @@
-.PHONY: setup ingest index run test lint format examples
+.PHONY: setup ingest index run test lint format examples benchmark
 
 setup:
 	python3 -m venv .venv
@@ -25,3 +25,6 @@ format:
 
 examples:
 	.venv/bin/python -m scripts.run_examples
+
+benchmark:
+	.venv/bin/python -m scripts.benchmark_llm

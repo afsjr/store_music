@@ -1,0 +1,254 @@
+[
+  {
+    "provider": "deepseek",
+    "scenario": "catalogo",
+    "run": 1,
+    "latency_s": 10.709,
+    "status": 200,
+    "success": true,
+    "tools": [
+      "buscar_produtos"
+    ],
+    "handoff": false,
+    "reply_len": 650
+  },
+  {
+    "provider": "deepseek",
+    "scenario": "catalogo",
+    "run": 2,
+    "latency_s": 12.548,
+    "status": 200,
+    "success": true,
+    "tools": [
+      "buscar_produtos"
+    ],
+    "handoff": false,
+    "reply_len": 650
+  },
+  {
+    "provider": "deepseek",
+    "scenario": "catalogo",
+    "run": 3,
+    "latency_s": 10.66,
+    "status": 200,
+    "success": true,
+    "tools": [
+      "buscar_produtos"
+    ],
+    "handoff": false,
+    "reply_len": 495
+  },
+  {
+    "provider": "deepseek",
+    "scenario": "pedido",
+    "run": 1,
+    "latency_s": 10.186,
+    "status": 200,
+    "success": true,
+    "tools": [
+      "identificar_cliente",
+      "consultar_pedido"
+    ],
+    "handoff": false,
+    "reply_len": 423
+  },
+  {
+    "provider": "deepseek",
+    "scenario": "pedido",
+    "run": 2,
+    "latency_s": 10.207,
+    "status": 200,
+    "success": true,
+    "tools": [
+      "identificar_cliente",
+      "consultar_pedido"
+    ],
+    "handoff": false,
+    "reply_len": 434
+  },
+  {
+    "provider": "deepseek",
+    "scenario": "pedido",
+    "run": 3,
+    "latency_s": 10.431,
+    "status": 200,
+    "success": true,
+    "tools": [
+      "identificar_cliente",
+      "consultar_pedido"
+    ],
+    "handoff": false,
+    "reply_len": 423
+  },
+  {
+    "provider": "deepseek",
+    "scenario": "devolucao",
+    "run": 1,
+    "latency_s": 16.444,
+    "status": 200,
+    "success": true,
+    "tools": [
+      "identificar_cliente",
+      "consultar_politicas",
+      "consultar_pedido"
+    ],
+    "handoff": false,
+    "reply_len": 955
+  },
+  {
+    "provider": "deepseek",
+    "scenario": "devolucao",
+    "run": 2,
+    "latency_s": 12.757,
+    "status": 200,
+    "success": true,
+    "tools": [
+      "identificar_cliente",
+      "consultar_politicas",
+      "consultar_pedido"
+    ],
+    "handoff": false,
+    "reply_len": 1036
+  },
+  {
+    "provider": "deepseek",
+    "scenario": "devolucao",
+    "run": 3,
+    "latency_s": 12.278,
+    "status": 200,
+    "success": true,
+    "tools": [
+      "identificar_cliente",
+      "consultar_politicas",
+      "consultar_pedido"
+    ],
+    "handoff": false,
+    "reply_len": 979
+  },
+  {
+    "provider": "openai",
+    "scenario": "catalogo",
+    "run": 1,
+    "latency_s": 11.215,
+    "status": 200,
+    "success": true,
+    "tools": [
+      "buscar_produtos"
+    ],
+    "handoff": false,
+    "reply_len": 780
+  },
+  {
+    "provider": "openai",
+    "scenario": "catalogo",
+    "run": 2,
+    "latency_s": 13.563,
+    "status": 200,
+    "success": true,
+    "tools": [
+      "buscar_produtos"
+    ],
+    "handoff": false,
+    "reply_len": 779
+  },
+  {
+    "provider": "openai",
+    "scenario": "catalogo",
+    "run": 3,
+    "latency_s": 12.808,
+    "status": 200,
+    "success": true,
+    "tools": [
+      "buscar_produtos"
+    ],
+    "handoff": false,
+    "reply_len": 780
+  },
+  {
+    "provider": "openai",
+    "scenario": "pedido",
+    "run": 1,
+    "latency_s": 10.817,
+    "status": 200,
+    "success": true,
+    "tools": [
+      "identificar_cliente",
+      "consultar_pedido"
+    ],
+    "handoff": false,
+    "reply_len": 343
+  },
+  {
+    "provider": "openai",
+    "scenario": "pedido",
+    "run": 2,
+    "latency_s": 11.679,
+    "status": 200,
+    "success": true,
+    "tools": [
+      "identificar_cliente",
+      "consultar_pedido"
+    ],
+    "handoff": false,
+    "reply_len": 405
+  },
+  {
+    "provider": "openai",
+    "scenario": "pedido",
+    "run": 3,
+    "latency_s": 12.388,
+    "status": 200,
+    "success": true,
+    "tools": [
+      "identificar_cliente",
+      "consultar_pedido"
+    ],
+    "handoff": false,
+    "reply_len": 343
+  },
+  {
+    "provider": "openai",
+    "scenario": "devolucao",
+    "run": 1,
+    "latency_s": 15.759,
+    "status": 200,
+    "success": true,
+    "tools": [
+      "identificar_cliente",
+      "consultar_politicas",
+      "consultar_pedido"
+    ],
+    "handoff": false,
+    "reply_len": 455
+  },
+  {
+    "provider": "openai",
+    "scenario": "devolucao",
+    "run": 2,
+    "latency_s": 10.76,
+    "status": 200,
+    "success": true,
+    "tools": [
+      "identificar_cliente",
+      "consultar_politicas",
+      "consultar_pedido"
+    ],
+    "handoff": false,
+    "reply_len": 474
+  },
+  {
+    "provider": "openai",
+    "scenario": "devolucao",
+    "run": 3,
+    "latency_s": 11.65,
+    "status": 200,
+    "success": true,
+    "tools": [
+      "identificar_cliente",
+      "consultar_politicas",
+      "consultar_pedido"
+    ],
+    "handoff": false,
+    "reply_len": 543
+  }
+]
