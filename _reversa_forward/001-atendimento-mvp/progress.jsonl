@@ -34,3 +34,4 @@
 {"ts": "2026-11-03T18:25:35.818833Z", "action": "T020", "status": "corrected", "files": ["app/agent/orchestrator.py"], "note": "deduplicação de tool calls e filtro de citações"}
 {"ts": "2026-11-03T18:25:35.818833Z", "action": "T026", "status": "corrected", "files": ["examples/"], "note": "exemplos regenerados com DeepSeek real"}
 {"ts": "2026-11-03T18:25:35.818833Z", "action": "T030", "status": "corrected", "files": ["README.md", "tests/"], "note": "validação final com Supabase e 50 testes"}
+{"ts": "2026-11-03T18:56:08.218393Z", "action": "T008", "status": "corrected", "files": ["app/adapters/llm/factory.py", "scripts/benchmark_llm.py", "docs/llm_benchmark.md"], "note": "benchmark de latência: DeepSeek 10,71s vs OpenAI 11,68s; DeepSeek primário e OpenAI fallback"}

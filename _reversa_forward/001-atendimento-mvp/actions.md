@@ -73,6 +73,7 @@
 - Ingestão concluída: 9 categorias, 65 produtos, 50 clientes, 20 pedidos, 22 itens e 25 promoções.
 - Ajustes pós-validação: pool de conexões Supabase, thinking desativado, recuperação automática de políticas, limite de 5 itens por resposta e citação de seção/página.
 - 50 testes automatizados passando; lint e format limpos.
+- Benchmark de latência (03/11/2026): DeepSeek 10,71 s de mediana vs OpenAI 11,68 s. DeepSeek permanece primário e OpenAI fica como fallback.
 
 ## Histórico de alterações
 
