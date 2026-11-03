@@ -29,6 +29,8 @@ class Settings(BaseSettings):
 
     llm_provider: str = "deepseek"
     llm_model: str = "deepseek-flash"
+    deepseek_model: str = "deepseek-flash"
+    openai_model: str = "gpt-4o-mini"
     deepseek_api_key: str | None = None
     deepseek_base_url: str = "https://api.deepseek.com"
     openai_api_key: str | None = None
